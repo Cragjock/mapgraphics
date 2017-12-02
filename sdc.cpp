@@ -3,6 +3,8 @@
 
 
 extern Adafruit_RA8875 tft;
+  uint16_t row=0; 
+  uint16_t column=0;
 
 /***************/
 void drawBorder(Box mybox, uint16_t border)
@@ -83,6 +85,84 @@ void setCursorBlinkRate(uint8_t rate)
   
 }
 
+// ============================================
+void uploadUserChar(const uint8_t symbol[],enum RA8875_custom_font address)
+{
+    tft.writeCommand(RA8875_MWCR1);
+    uint8_t tempMWCR1 = tft.readData();
+
+    /* Set graphics mode */
+    tft.graphicsMode(); 
+    
+    //tft.writeCommand(RA8875_MWCR0);
+    //uint8_t temp = tft.readData();
+    //temp &= ~RA8875_MWCR0_TXTMODE; // bit #7
+    //tft.writeData(temp);
+
+    // set CGRAM address
+    tft.writeCommand(RA8875_CGSR);    // reg 23
+    tft.writeData(address);
+
+    //set reg 21 bit 7 =0
+    tft.writeReg(RA8875_FNCR0, 0x00); 
+    tft.writeReg(RA8875_MWCR1, 0x04); 
+    
+    //tft.writeCommand(RA8875_FNCR0);
+    //temp = tft.readData();
+    //temp &= ~RA8875_FNCR0_CGROM;
+    //tft.writeData(temp);
+
+  // set reg 41 for CGRAM destination
+    //tft.writeCommand(RA8875_MWCR1);
+    //temp = tft.readData();
+    //temp &= ~RA8875_MWCR1_CGRAM; // bit #2-3
+    //tft.writeData(temp);
+
+    tft.writeCommand(RA8875_MRWC);
+
+  for (int i=0;i<16;i++)
+  {
+    //Serial.println("loading stuff ");
+    tft.writeData(pgm_read_byte(&symbol[i]));   
+    //Serial.println(pgm_read_byte(&symbol[i]));    
+    
+    
+    //tft.writeData(symbol[i]);
+    //Serial.println(symbol[i]); 
+    //tft.writeData(pgm_read_byte(&g1_cursor[i])); 
+  }
+  //restore register
+    //tft.writeCommand(RA8875_MWCR1);
+    //tft.writeData(tempMWCR1);
+}
+
+
+// ===== drawsthe LCD Display image =====
+void draw_map(const uint16_t scmap[],uint16_t r, uint16_t c, Box mapbox)
+{
+    int row, column =0;
+    int j =0; 
+    
+    for(row=0; row<r; row++)    // was 163 for world 565, 213 for charmap fpt LCD2, 320 x144
+    {
+      yield(); 
+      for(column=0; column<c; column++) 
+      {
+          //tft.drawPixel((column + mapbox.x), (row+mapbox.y), pgm_read_word(&charmap[j])); // 320x215
+          //tft.drawPixel((column + mapbox.x), (row+mapbox.y), pgm_read_word(&world565[j]));  //320x163
+          tft.drawPixel((column + mapbox.x), (row+mapbox.y), pgm_read_word( &(scmap[j]) ));    // GOOD
+          // tft.drawPixel((column + mapbox.x), (row+mapbox.y), scmap[j]);    // GOOD
+          //Serial.println(scmap[j]);
+          //Serial.print("j ");
+          //Serial.println(j);
+          
+          
+          j=j+1;
+      }
+    }  
+}
+
+
 
 
 
@@ -122,12 +202,8 @@ const uint8_t g1_cursor[] PROGMEM = {
 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAF, 0xFF
 };
 
-  //uint8_t bmSatLeft[]={0,20,21,21,31,21,20,20};
-  //uint8_t bmSatright[]= {0,5,21,21,31,21,5,5};
-  //const uint8_t bmSatLeft[]={0,20,21,21,31,21,20,20,0,5,21,21,31,21,5,5};
-  //const uint8_t bmSatright[]= {0,5,21,21,31,21,5,5,0,20,21,21,31,21,20,20};
 
-    // my ISS looking icon for test mode 
+// my ISS looking icon for test mode 
   const uint8_t bmSatLeft[]PROGMEM ={0x80, 0x80, 0x90, 0x91, 0x91, 0x91, 0x93, 0xFF, 0x93, 0x91, 0x91, 0x91, 0x90, 0x80, 0x80, 0x00 };
   const uint8_t bmSatright[]PROGMEM = {0x02, 0x02, 0x12, 0x12, 0x12, 0x12, 0x92, 0xFE, 0x92, 0x12, 0x12, 0x12, 0x12, 0x02, 0x02, 0x00 };
 
