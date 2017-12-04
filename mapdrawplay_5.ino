@@ -16,7 +16,7 @@
 #include "sdc.h"
 
 #define RA8875_INT 3
-#define RA8875_CS 2
+#define RA8875_CS 2   // tied to blue LED too? 
 #define RA8875_RESET 16
 
 #define SEALEVELPRESSURE_HPA (1013.25)
@@ -34,24 +34,24 @@ void setup()
 
   bool status;
   Serial.begin(115200);
-  Serial.println("BME start");
+  Serial.println(F("BME start"));
   status = bme.begin();  
   if (!status) 
   {
-        Serial.println("Could not find a valid BME280 sensor, check wiring!");
+        Serial.println(F("Could not find a valid BME280 sensor, check wiring!"));
         while (1);
   }
-  Serial.println("RA8875 start");
+  Serial.println(F("RA8875 start"));
   
   #ifdef ESP8266    // THIS IS CORRECT 
-  Serial.println("ESP8266 yes");
+  Serial.println(F("ESP8266 yes"));
   #else
-  Serial.println("ESP8266 = no");
+  Serial.println(F("ESP8266 = no"));
   #endif
 
   if (!tft.begin(RA8875_800x480)) 
   {
-    Serial.println("RA8875 Not Found!");
+    Serial.println(F("RA8875 Not Found!"));
     while (1);
   }
 
@@ -64,7 +64,7 @@ void setup()
 // ============ BASIC SETUP Complete =================
 
 
-  char string1[15] = "start where!  ";
+  const char string1[15] = "start where!  ";
   const char sdceng[] ={0x53,0x74,0x65,0x76,0x65,0x6e,0xB0,0x0};
   //const char sdceng1[] ={0x53,0x74,0x65,0x76,0x65,0x6e,0xB0,0x0};
   const char sdceng1[] ={'S','t','e','v','e','n',0xB0,0x0};
@@ -134,11 +134,14 @@ void setup()
   tft.write(0x34); // number 4 
   tft.write('S');
   tft.write('D');
+  //tft.setTextColor(RA8875_RED);   // this works for garphic fonts
+  //tft.setTextColor(RA8875_GREEN, RA8875_RED);  // this works for graphic fonts but no bg color for write print etc
   tft.write('C');
   tft.write(' ');
   tft.write('!');
   tft.drawRect(10, 300, 16*5,  18*1, RA8875_YELLOW);
   tft.print("9 Steven"); // this works too 
+  tft.drawChar(10, 200, 'D', RA8875_YELLOW, RA8875_WHITE, 1); // this works to set graphic font color too and size! 
 
   tft.setFont(&FreeSerifItalic18pt8b);  
   tft.setCursor(10,250); 
@@ -196,7 +199,8 @@ void setup()
 
   Box LCDbox={400,200,321,145, RA8875_RED};  // LCD2, 321 145
 
-  drawBorder(mapbox, border);
+  //drawBorder(mapbox, border);
+  tft.drawBorder(mapbox.x ,mapbox.y, mapbox.w, mapbox.h, border);   // i added drawborder into Adafruit lib 
   //drawBorder(LCDbox, border);
 
 // ===== draws the LCD Display image =====
@@ -215,10 +219,10 @@ void setup()
     }
 **************************************************************/
   
-  draw_map(lcd3,225,500, mapbox); 
+  draw_map(lcd3,225,500, mapbox); // the BIG LCD graphic 
   
   Box testbox={10,20,321,145, RA8875_RED}; 
-  draw_map(LCD2,144,320, testbox); 
+ // draw_map(LCD2,144,320, testbox); // the smaller LCD graphic
     
     //int lcdsize = sizeof(LCD2)/sizeof(LCD2[0]);
     //Serial.print("lcdsize ");
@@ -235,73 +239,9 @@ void setup()
     //tft.drawRect(mapbox.x, mapbox.y, mapbox.w, mapbox.h, mapbox.c); 
 
 
-// byte mode draw map 
-//    j=0;
-//    for(row=0; row<144; row++)
-//    {
-//      yield(); 
-//      for(column=0; column<320; column++)
-//      {
-//          HB = pgm_read_byte(&LCD6[j]); 
-//          ALL = pgm_read_byte(&LCD6[j+1]);
-//          ALL = ALL | (HB << 8);
-          // ALL = ~ALL;
-         // tft.drawPixel((column + mapbox.x), (row+mapbox.y), ALL);
-//          j=j+2;
-//      }
-//    }
-
-// byte mode draw map 
-
-
-/************************
-// byte mode draw map with stretch
-    j=0;
-    d_position=0;
-    
-    for(row=0; row<144; row++)
-    {
-      yield(); 
-      for(d_position=0; d_position<640; (d_position++)*2)
-      {
-          HB = pgm_read_word(&LCD2[d_position/2 + (row*320) ]); 
-          //ALL = pgm_read_byte(&LCD6[d_position/2+1]);
-          //ALL = ALL | (HB << 8);
-          // ALL = ~ALL;
-          tft.drawPixel((d_position + mapbox.x), (row+mapbox.y), HB);
-          tft.drawPixel((d_position+1 + mapbox.x), (row+mapbox.y), HB);
-          //j=j+2;
-      }
-    }
-
-// byte mode draw map 
-*****************/
 
 
 
-    
-
-  Box CS_box={0,0,250,140, RA8875_RED};
-  uint16_t main_width = 160;
-  uint16_t main_height = 140;
-  uint16_t small_width = 250;
-  uint16_t small_height = 170;
-  uint16_t CS_width = 250;
-  uint16_t CS_height = 140;
-  uint16_t GPS_height = 170; 
- 
-  
- /*************** 
-  
-  tft.fillRect(0, 0, 250, 140, RA8875_WHITE);
-  tft.fillRect(CS_box.w+1, 0, main_width, main_height, RA8875_GREEN);
-  tft.fillRect(CS_box.w+main_width*1+1, 0, main_width, main_height, RA8875_BLUE);
-  tft.fillRect(CS_box.w+main_width*2+1, 0, main_width, main_height, RA8875_RED);
-
-  tft.fillRect(0, CS_box.x+main_height+1, CS_width, GPS_height, RA8875_OLIVE);
-  tft.fillRect(0, CS_box.x+main_height+small_height+1, CS_width, GPS_height, RA8875_RED);
-**********************/
-  
 
   
   /* Set a solid for + bg color ... */
@@ -310,47 +250,45 @@ void setup()
   tft.textSetCursor(10, 10);
 
 
-  // check font set
-  //tft.writeCommand(0x21);
-  //Serial.print("font set selected: ");
-  //tft.writeData(0x01); 
-  //Serial.println(tft.readData());
-
-
-//  setvisiblecursor(UNDER, true);
-/* trun on cursor blink for 0.5 seconds  */
-//  setCursorBlinkRate(0x1E);
-//  tft.writeReg(RA8875_MWCR0, 0xF0);     // 0xf0 text mode, font write cursor visible, blink on 
-  
-  //tft.writeCommand(RA8875_MWCR0);
-  //tft.writeData(0xF0);
-  //tft.writeReg(RA8875_BTCR, 0x1E);    // cursor blink rate, see page 103 of spec for equation 
-  //tft.writeCommand(0x44);
-  //tft.writeData(0x1E);
 
   
   // ========== top header area =============
   /* Render some text! */
 
   Box header_L = {0,5,266,20};
-  tft.drawRect(0,5,266,20, RA8875_WHITE);
+  //tft.drawRect(0,5,266,20, RA8875_WHITE);
   Box header_C = {266,5,268,20};
-  tft.drawRect(266,5,268,20, RA8875_WHITE);
+  //tft.drawRect(266,5,268,20, RA8875_WHITE);
   Box header_R = {534,5,266,20};
-  tft.drawRect(534,5,266,20, RA8875_WHITE);
+  //tft.drawRect(534,5,266,20, RA8875_WHITE);
   
   tft.textMode();   // ==== TEXT MODE ON ====
   char string[17] = " Hey de KC6FEW! ";
   tft.textSetCursor(header_L.x, header_L.y); 
   tft.textTransparent(RA8875_WHITE);
   tft.textWrite(string);
-  tft.textColor(RA8875_WHITE, RA8875_RED);
+  tft.textColor(RA8875_WHITE, RA8875_RED);    // only changes text mode, not graphics mode
   tft.textWrite(string);
 
   tft.graphicsMode(); // ==== GRAPHICS MODE ON ====
+  tft.setTextColor(RA8875_YELLOW);
   tft.setFont(&FreeSerifItalic24pt7b);  
   tft.setCursor(header_C.x,header_C.y+40); 
-  tft.print("-[ WELCOME! ]-"); // this works too 
+  tft.print("-[Welcome!]-"); // this works too 
+  tft.setTextColor(RA8875_WHITE);
+
+  /********************
+  int16_t px;
+  int16_t py;
+  uint16_t pw;
+  uint16_t ph;
+  tft.getTextBounds("-[Welcome!]-", 266, 5, &px, &py, &pw, &ph);    // this works ok 
+  Serial.println(px);
+  Serial.println(py);
+  Serial.println(pw);
+  Serial.println(ph);
+  ***************************/
+
 
   tft.textMode();   // ==== TEXT MODE ON ====
   
@@ -376,20 +314,20 @@ void setup()
   //    tft.textColor(RA8875_YELLOW, RA8875_BLACK);
   char h_buffer[20];
   float bm_humid = bme.readHumidity(); 
-  tft.textWrite(dtostrf(bm_humid, 3,3, h_buffer) );
+  //tft.textWrite(dtostrf(bm_humid, 3,3, h_buffer) );
   
-  tft.textWrite(string);
+ // tft.textWrite(string);
   
   tft.textSetCursor(10, 40);
   tft.textEnlarge(2);
 
   float bm_temp = bme.readTemperature();
   char t_buffer[20];
-  tft.textWrite(dtostrf(bm_temp, 3,3, t_buffer) );
+ // tft.textWrite(dtostrf(bm_temp, 3,3, t_buffer) );
 
 
-  tft.drawRect(10,40,(8*3*16), 16*3+3, RA8875_YELLOW);
-  // Serial.println("at sensor check ");
+  // tft.drawRect(10,40,(8*3*16), 16*3+3, RA8875_YELLOW);
+
   printValues();
   
 
@@ -425,24 +363,11 @@ void setup()
     
   tft.textMode();   // ==== TEXT MODE ON ====
 
-/*************************************
-  BTE_block_move  ( 0, //SourceX
-              0, //SourceY 
-              300, //Width
-              225, //Height
-              400, //DestX
-              200, //DestY
-              0x02);
-************************************/              
 
-              
- //Serial.println("by BTE .....");             
-
-  tft.textMode(); 
-   //Serial.println("by BTE 123 ....."); 
 
 }
 // ================== END =============
+
 float bm_temp=0;
 float bm_prior=0;
 const char degreefont[] ={0xB0,0x0};
@@ -490,7 +415,7 @@ void loop()
   // Box mapbox={150,127,500,225, RA8875_RED} for big LCD 
   //    tft.drawRect(475, 250, 90, 30, RA8875_WHITE);
   
-  Box source = {471, 250, 90, 31, RA8875_WHITE};
+  Box source = {471, 250, 95, 31, RA8875_WHITE};
   //tft.drawRect(source.x, source.y, source.w, source.h, source.c);
 
   // for flicker avoidance ============
@@ -533,13 +458,12 @@ void loop()
   //Serial.println(pw);
   //Serial.println(ph);
 
+
   tft.textMode();
-
-
-
-
   
+
 }
+// ============== END END END ===============
 
 void printValues() 
 {

@@ -43,6 +43,29 @@
 #define RA8875_GCC0 0x84
 #define RA8875_GCC1 0x85
 
+#define RA8875_HSAW0  0x30
+#define RA8875_HSAW1  0x31
+#define RA8875_VSAW0  0x32
+#define RA8875_VSAW1  0x33
+#define RA8875_HEAW0  0x34
+#define RA8875_HEAW1  0x35
+#define RA8875_VEAW0  0x36
+#define RA8875_VEAW1  0x37
+#define RA8875_HSSW0  0x38
+#define RA8875_HSSW1  0x39
+#define RA8875_VSSW0  0x3A
+#define RA8875_VSSW1  0x3B
+#define RA8875_HESW0  0x3C
+#define RA8875_HESW1  0x3D
+#define RA8875_VESW0  0x3E
+#define RA8875_VESW1  0x3F
+
+#define RA8875_LTPR0 0x52
+enum RA8875scrollMode{ SIMULTANEOUS, LAYER1ONLY, LAYER2ONLY, BUFFERED };
+
+
+
+
 
 #define RA8875_MWCR1_CGRAM  0x40
 
@@ -50,12 +73,12 @@
 #define RA8875_FNCR0_CGRAM  0x80
 
 
-#define RA8875_NAVY 0x000F
-#define RA8875_DARK_GREEN 0x03E0
-#define RA8875_PURPLE 0x780F
-#define RA8875_OLIVE 0x7BE0
-#define RA8875_LIGHT_GREY 0xC618
-#define RA8875_DARK_GREY 0x7BEF
+//#define RA8875_NAVY 0x000F
+//#define RA8875_DARK_GREEN 0x03E0
+//#define RA8875_PURPLE 0x780F
+//#define RA8875_OLIVE 0x7BE0
+//#define RA8875_LIGHT_GREY 0xC618
+//#define RA8875_DARK_GREY 0x7BEF
 
 
 
@@ -76,8 +99,10 @@ void printValues();
 void uploadUserChar(const uint8_t symbol[],enum RA8875_custom_font address);
 
 
-
-
+// ------------------ SCroll stuff -------------
+void scroll(int16_t x,int16_t y);
+void setScrollWindow(int16_t XL,int16_t XR ,int16_t YT ,int16_t YB);
+void setScrollMode(enum RA8875scrollMode mode);
 
 
 //-------------- BTE ---------------------------

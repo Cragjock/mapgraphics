@@ -27,6 +27,36 @@ void drawBorder(Box mybox, uint16_t border)
 }
 /*****************/
 
+
+/***************
+bool Adafruit_RA8875 :: drawBorder(uint16_t x,uint16_t y, uint16_t w, uint16_t h, uint16_t border)
+{
+  if(border > 100)    // border too big 
+    return false;
+
+  this->fillRect(x-border, y-border, w + border*2, h + border*2, RA8875_WHITE);
+  this->fillRect(x, y, w + border, h + border, RA8875_DARK_GREY);
+  this->fillTriangle( x - border, y + h + border, 
+                x, y + mybox.h,
+                x, y + h + border,
+                RA8875_DARK_GREY);
+
+  this->fillTriangle( x + w, .y, 
+                x + w + border, y - border,
+                x + w + border, y,
+                RA8875_DARK_GREY);
+
+  this->drawLine(x + w, y + h, x + w + border, y + h + border, RA8875_BLACK);
+
+  return true; 
+
+}
+*****************/
+
+
+
+
+
 bool setvisiblecursor(enum RA8875tcursor c, bool blink)
 {
   uint8_t cW = 0;

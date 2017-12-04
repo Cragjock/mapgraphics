@@ -27,12 +27,11 @@ void BTE_block_move(  int16_t SourceX,
 
   
   BTE_check_busy();
-  
-Serial.println("hello .....");
+  // Serial.println("hello .....");
 }
 
 //===================================================
-//===== nevergot this working correctly ==========
+//===== never got this working correctly ==========
 void BTE_write_move(  int16_t SourceX, 
                 int16_t SourceY, 
                 int16_t Width, 
